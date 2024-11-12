@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Sensor IoT</title>
+    <style>
+        /* Gaya dasar */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f2f7fa, #dbe9f6);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        .section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 1.3em;
+            color: #2980b9;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: '🔍';
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+
+        /* Gaya tabel */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ececec;
+        }
+        th {
+            background-color: #2980b9;
+            color: #fff;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #d6eaf8;
+            cursor: pointer;
+        }
+
+        /* Gaya daftar */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #eaf4fb;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            color: #2c3e50;
+        }
+        ul li::before {
+            content: '📅';
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Data Sensor IoT</h1>
+
+        <!-- Bagian Suhu dan Humidity -->
+        <div class="section">
+            <p class="section-title">Informasi Suhu</p>
+            <p>Suhu Maksimum: <strong><span id="suhuMax"></span> °C</strong></p>
+            <p>Suhu Minimum: <strong><span id="suhuMin"></span> °C</strong></p>
+            <p>Rata-rata Suhu: <strong><span id="suhuRata"></span> °C</strong></p>
+        </div>
+
+        <!-- Bagian Nilai Suhu Max dan Humidity Max -->
+        <div class="section">
+            <p class="section-title">Data Suhu Maksimum dengan Humidity</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Suhu (°C)</th>
+                        <th>Humidity (%)</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="dataSuhuMaxHumidMax"></tbody>
+            </table>
+        </div>
+
+        <!-- Bagian Bulan dan Tahun Maksimum -->
+        <div class="section">
+            <p class="section-title">Bulan dan Tahun Maksimum</p>
+            <ul id="mountYearMax"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Mengambil data dari API
+        fetch('http://localhost/152022131_Zahra%20Cahya%20D%20S/get.php')
+            .then(response => response.json())
+            .then(data => {
+                // Menampilkan data suhu dan rata-rata
+                document.getElementById('suhuMax').textContent = data.suhumax;
+                document.getElementById('suhuMin').textContent = data.suhumin;
+                document.getElementById('suhuRata').textContent = data.suhurata;
+
+                // Menampilkan data suhu maksimum dan humidity maksimum dalam tabel
+                const dataSuhuMaxHumidMax = data.nilai_suhu_max_humid_max;
+                const tableBody = document.getElementById('dataSuhuMaxHumidMax');
+                dataSuhuMaxHumidMax.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.suhu}</td>
+                        <td>${item.humid !== null ? item.humid : 'N/A'}</td>
+                        <td>${item.ts}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Menampilkan bulan dan tahun maksimum
+                const mountYearMax = data.mount_year_max;
+                const mountYearList = document.getElementById('mountYearMax');
+                mountYearMax.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = item.mount_years;
+                    mountYearList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+
+</body>
+</html>
